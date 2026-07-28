@@ -1,5 +1,6 @@
  package com.keystone.backend.service;
 
+ import com.keystone.backend.dto.LoginRequest;
  import com.keystone.backend.dto.RegisterRequest;
 import com.keystone.backend.entity.Role;
 import com.keystone.backend.entity.User;
@@ -10,6 +11,7 @@ import com.keystone.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.keystone.backend.dto.LoginRequest;
 
 @Service
 public class UserService {
@@ -46,5 +48,22 @@ public class UserService {
     userRepository.save(user);
    
     return "User registered successfully!";
+
+
 }
+ public String loginUser(LoginRequest request) {
+
+    Optional<User> userOptional =
+        userRepository.findByEmail(request.getEmail());
+
+        if (userOptional.isEmpty()) {
+    return "Email not found!";
+}
+        User user = userOptional.get();
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+    return "Invalid password!";
+}
+        return "Login Successful";
+    }
 }
