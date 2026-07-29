@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -31,5 +32,14 @@ public List<CustomerResponse> getAllCustomers() {
 
     return customerService.getAllCustomers();
 
+}
+
+
+   @GetMapping("/{id}")
+public CustomerResponse getCustomerById(@PathVariable Long id) {
+
+     System.out.println(">>>>>>>> Controller reached with ID = " + id);
+
+    return customerService.getCustomerById(id);
 }
 }

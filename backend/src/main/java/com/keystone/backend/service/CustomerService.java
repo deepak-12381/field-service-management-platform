@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.util.Optional;
 
 @Service
 public class CustomerService {
@@ -77,6 +77,31 @@ public List<CustomerResponse> getAllCustomers() {
                 customer.getPincode()
         ))
         .collect(Collectors.toList());
+
+}
+  public CustomerResponse getCustomerById(Long id) {
+
+     Optional<Customer> optionalCustomer = customerRepository.findById(id);
+
+
+     if (optionalCustomer.isPresent()) {
+
+        Customer customer = optionalCustomer.get();
+
+        return new CustomerResponse(
+        customer.getId(),
+        customer.getCustomerName(),
+        customer.getEmail(),
+        customer.getPhone(),
+        customer.getAddress(),
+        customer.getCity(),
+        customer.getState(),
+        customer.getPincode()
+);
+
+}
+
+     throw new RuntimeException("Customer not found with ID: " + id);
 
 }
 
