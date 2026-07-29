@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import com.keystone.backend.entity.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -55,6 +57,26 @@ customer = customerRepository.save(customer);
         customer.getState(),
         customer.getPincode()
 );
+
+}
+
+public List<CustomerResponse> getAllCustomers() {
+
+     List<Customer> customers = customerRepository.findAll();
+
+        
+     return customers.stream()
+        .map(customer -> new CustomerResponse(
+                customer.getId(),
+                customer.getCustomerName(),
+                customer.getEmail(),
+                customer.getPhone(),
+                customer.getAddress(),
+                customer.getCity(),
+                customer.getState(),
+                customer.getPincode()
+        ))
+        .collect(Collectors.toList());
 
 }
 
