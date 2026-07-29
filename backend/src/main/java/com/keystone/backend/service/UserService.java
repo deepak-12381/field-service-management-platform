@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.keystone.backend.dto.LoginRequest;
+import com.keystone.backend.util.JwtUtil;
 
 @Service
 public class UserService {
@@ -24,6 +25,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
  
       
      public String registerUser(RegisterRequest request) {
@@ -64,6 +68,8 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
     return "Invalid password!";
 }
-        return "Login Successful";
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return token;
     }
 }
