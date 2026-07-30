@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -41,5 +44,22 @@ public CustomerResponse getCustomerById(@PathVariable Long id) {
      System.out.println(">>>>>>>> Controller reached with ID = " + id);
 
     return customerService.getCustomerById(id);
+}
+
+
+  @PutMapping("/{id}")
+public CustomerResponse updateCustomer(
+        @PathVariable Long id,
+        @RequestBody CreateCustomerRequest request) {
+
+    return customerService.updateCustomer(id, request);
+
+}
+
+  @DeleteMapping("/{id}")
+public String deleteCustomer(@PathVariable Long id) {
+
+    return customerService.deleteCustomer(id);
+
 }
 }

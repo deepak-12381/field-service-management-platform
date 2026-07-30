@@ -105,4 +105,61 @@ public List<CustomerResponse> getAllCustomers() {
 
 }
 
+public CustomerResponse updateCustomer(Long id, CreateCustomerRequest request) {
+
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+     
+
+
+        if (optionalCustomer.isPresent()) {
+
+                Customer customer = optionalCustomer.get();
+
+customer.setCustomerName(request.getCustomerName());
+customer.setEmail(request.getEmail());
+customer.setPhone(request.getPhone());
+customer.setAddress(request.getAddress());
+customer.setCity(request.getCity());
+customer.setState(request.getState());
+customer.setPincode(request.getPincode());
+
+customerRepository.save(customer);
+
+
+  return new CustomerResponse(
+                customer.getId(),
+                customer.getCustomerName(),
+                customer.getEmail(),
+                customer.getPhone(),
+                customer.getAddress(),
+                customer.getCity(),
+                customer.getState(),
+                customer.getPincode()
+        );
+
+}
+     throw new RuntimeException("Customer not found with ID: " + id);
+
+}
+
+  
+  
+public String deleteCustomer(Long id) {
+
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+
+        if (optionalCustomer.isPresent()) {
+
+                Customer customer = optionalCustomer.get();
+
+                customerRepository.delete(customer);
+
+                return "Customer deleted successfully.";
+
+}
+
+     throw new RuntimeException("Customer not found with ID: " + id);
+
+}
+
 }
