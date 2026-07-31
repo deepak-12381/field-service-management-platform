@@ -19,6 +19,11 @@ import com.keystone.backend.entity.User;
 import com.keystone.backend.repository.UserRepository;
 
 import com.keystone.backend.entity.WorkOrderStatusHistory;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
  
 
 
@@ -202,6 +207,18 @@ private WorkOrderResponse mapToResponse(WorkOrder workOrder) {
 }
 
     return response;
+}
+
+ public Page<WorkOrderResponse> getAllWorkOrders(int page, int size, String sortBy, String direction) {
+
+    Sort sort = direction.equalsIgnoreCase("desc")
+            ? Sort.by(sortBy).descending()
+            : Sort.by(sortBy).ascending();
+
+    Pageable pageable = PageRequest.of(page, size, sort);
+
+    return workOrderRepository.findAll(pageable)
+            .map(this::mapToResponse);
 }
 
 }

@@ -6,7 +6,8 @@ import com.keystone.backend.dto.WorkOrderResponse;
 import com.keystone.backend.service.WorkOrderService;
 import org.springframework.web.bind.annotation.*;
 import com.keystone.backend.dto.AssignTechnicianRequest;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -26,11 +27,7 @@ public WorkOrderResponse createWorkOrder(@RequestBody CreateWorkOrderRequest req
     return workOrderService.createWorkOrder(request);
 }
 
-@GetMapping
-public List<WorkOrderResponse> getAllWorkOrders() {
-
-    return workOrderService.getAllWorkOrders();
-}
+ 
 
 @GetMapping("/{id}")
 public WorkOrderResponse getWorkOrderById(@PathVariable Long id) {
@@ -87,6 +84,16 @@ public WorkOrderResponse assignTechnician(
 public void deleteWorkOrder(@PathVariable Long id) {
 
     workOrderService.deleteWorkOrder(id);
+}
+
+@GetMapping
+public Page<WorkOrderResponse> getAllWorkOrders(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String direction) {
+
+    return workOrderService.getAllWorkOrders(page, size, sortBy, direction);
 }
 
 }
