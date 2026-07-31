@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
+import com.keystone.backend.exception.ResourceNotFoundException;
 
 @Service
 public class CustomerService {
@@ -82,8 +83,7 @@ public List<CustomerResponse> getAllCustomers() {
   public CustomerResponse getCustomerById(Long id) {
 
      Optional<Customer> optionalCustomer = customerRepository.findById(id);
-
-
+     
      if (optionalCustomer.isPresent()) {
 
         Customer customer = optionalCustomer.get();
@@ -100,9 +100,7 @@ public List<CustomerResponse> getAllCustomers() {
 );
 
 }
-
-     throw new RuntimeException("Customer not found with ID: " + id);
-
+     throw new ResourceNotFoundException("Customer not found with ID: " + id);
 }
 
 public CustomerResponse updateCustomer(Long id, CreateCustomerRequest request) {
@@ -138,7 +136,7 @@ customerRepository.save(customer);
         );
 
 }
-     throw new RuntimeException("Customer not found with ID: " + id);
+     throw new  ResourceNotFoundException("Customer not found with ID: " + id);
 
 }
 
@@ -158,7 +156,7 @@ public String deleteCustomer(Long id) {
 
 }
 
-     throw new RuntimeException("Customer not found with ID: " + id);
+     throw new ResourceNotFoundException("Customer not found with ID: " + id);
 
 }
 

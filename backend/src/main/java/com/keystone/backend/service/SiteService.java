@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
+import com.keystone.backend.exception.ResourceNotFoundException;
 
 @Service
 public class SiteService {
@@ -72,7 +73,7 @@ public SiteResponse createSite(CreateSiteRequest request, String createdBy) {
 );
 }
 
-public List<SiteResponse> getAllSites() {
+public List<SiteResponse>  getAllSites(){
 
     List<Site> sites = siteRepository.findAll();
 
@@ -117,7 +118,7 @@ if (optionalSite.isPresent()) {
     );
 }
 
-throw new RuntimeException("Site not found with ID: " + id);
+throw new  ResourceNotFoundException("Site not found with ID: " + id);
 
 }
 
@@ -160,7 +161,7 @@ return new SiteResponse(
 
 }
 
-throw new RuntimeException("Site or Customer not found.");
+throw new  ResourceNotFoundException("Site or Customer not found.");
 
 }
 
@@ -178,7 +179,7 @@ if (optionalSite.isPresent()) {
 
 }
 
-throw new RuntimeException("Site not found with ID: " + id);
+throw new  ResourceNotFoundException("Site not found with ID: " + id);
 
 }
 }

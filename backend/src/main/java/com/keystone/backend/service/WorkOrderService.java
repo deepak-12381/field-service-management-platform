@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import com.keystone.backend.exception.ResourceNotFoundException;
  
 
 
@@ -58,7 +59,7 @@ public class WorkOrderService {
 
 
     Site site = siteRepository.findById(request.getSiteId())
-            .orElseThrow(() -> new RuntimeException("Site not found"));
+            .orElseThrow(() -> new  ResourceNotFoundException("Site not found"));
 
     WorkOrder workOrder = new WorkOrder();
     workOrder.setTitle(request.getTitle());
@@ -84,7 +85,7 @@ public class WorkOrderService {
 public WorkOrderResponse getWorkOrderById(Long id) {
 
     WorkOrder workOrder = workOrderRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Work Order not found"));
+            .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
 
     return mapToResponse(workOrder);
 }
@@ -92,12 +93,12 @@ public WorkOrderResponse getWorkOrderById(Long id) {
 public WorkOrderResponse updateWorkOrder(Long id, CreateWorkOrderRequest request) {
 
     WorkOrder workOrder = workOrderRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Work Order not found"));
+            .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
 
           String oldStatus = workOrder.getStatus();  
 
     Site site = siteRepository.findById(request.getSiteId())
-            .orElseThrow(() -> new RuntimeException("Site not found"));
+            .orElseThrow(() -> new  ResourceNotFoundException("Site not found"));
 
     workOrder.setTitle(request.getTitle());
     workOrder.setDescription(request.getDescription());
@@ -131,10 +132,10 @@ public WorkOrderResponse updateWorkOrder(Long id, CreateWorkOrderRequest request
                                           AssignTechnicianRequest request) {
 
     WorkOrder workOrder = workOrderRepository.findById(workOrderId)
-            .orElseThrow(() -> new RuntimeException("Work Order not found"));
+            .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
 
     User technician = userRepository.findById(request.getTechnicianId())
-            .orElseThrow(() -> new RuntimeException("Technician not found"));
+            .orElseThrow(() -> new  ResourceNotFoundException("Technician not found"));
 
     workOrder.setTechnician(technician);
 
@@ -146,7 +147,7 @@ public WorkOrderResponse updateWorkOrder(Long id, CreateWorkOrderRequest request
   public void deleteWorkOrder(Long id) {
 
     WorkOrder workOrder = workOrderRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Work Order not found"));
+            .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
 
     workOrderRepository.delete(workOrder);
 }
