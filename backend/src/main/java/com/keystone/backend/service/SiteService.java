@@ -17,8 +17,14 @@ import java.util.List;
 import java.util.ArrayList;
 import com.keystone.backend.exception.ResourceNotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class SiteService {
+
+    private static final Logger logger =
+        LoggerFactory.getLogger(SiteService.class);
 
 
     @Autowired
@@ -30,6 +36,8 @@ private CustomerRepository customerRepository;
 
   
 public SiteResponse createSite(CreateSiteRequest request, String createdBy) {
+
+     logger.info("Creating site: {}", request.getSiteName());
 
 
     Optional<Customer> optionalCustomer =
@@ -53,6 +61,9 @@ public SiteResponse createSite(CreateSiteRequest request, String createdBy) {
 
    site.setCustomer(customer);
    siteRepository.save(site);
+
+    logger.info("Site created successfully with ID: {}", site.getId());
+
 
    return new SiteResponse(
         site.getId(),
@@ -101,9 +112,13 @@ for (Site site : sites) {
 
  public SiteResponse getSiteById(Long id) {
 
+    logger.info("Fetching site with ID: {}", id);
+
      Optional<Site> optionalSite = siteRepository.findById(id);
 
 if (optionalSite.isPresent()) {
+
+    logger.info("Site found with ID: {}", id);
 
     Site site = optionalSite.get();
 
@@ -117,7 +132,8 @@ if (optionalSite.isPresent()) {
             site.getCustomer().getCustomerName()
     );
 }
-
+   
+  logger.warn("Site not found with ID: {}", id);
 throw new  ResourceNotFoundException("Site not found with ID: " + id);
 
 }
@@ -127,6 +143,8 @@ throw new  ResourceNotFoundException("Site not found with ID: " + id);
  
  public SiteResponse updateSite(Long id, CreateSiteRequest request) {
 
+     logger.info("Updating site with ID: {}", id);
+
      Optional<Site> optionalSite = siteRepository.findById(id);
 
 Optional<Customer> optionalCustomer =
@@ -135,6 +153,8 @@ Optional<Customer> optionalCustomer =
 if (optionalSite.isPresent() && optionalCustomer.isPresent()) {
 
     Site site = optionalSite.get();
+
+    logger.info("Updating site with ID: {}", id);
 
 Customer customer = optionalCustomer.get();
 
@@ -149,6 +169,8 @@ site.setCustomer(customer);
 
 siteRepository.save(site);
 
+ logger.info("Site updated successfully with ID: {}", id);
+
 return new SiteResponse(
         site.getId(),
         site.getSiteName(),
@@ -160,24 +182,31 @@ return new SiteResponse(
 );
 
 }
-
+  
+   logger.warn("Site not found for update with ID: {}", id);
 throw new  ResourceNotFoundException("Site or Customer not found.");
 
 }
 
 public String deleteSite(Long id) {
 
+     logger.info("Deleting site with ID: {}", id);
+
      Optional<Site> optionalSite = siteRepository.findById(id);
 
 if (optionalSite.isPresent()) {
 
     Site site = optionalSite.get();
+     logger.info("Site found for deletion with ID: {}", id);
 
     siteRepository.delete(site);
 
+    logger.info("Site deleted successfully with ID: {}", id);
+
     return "Site deleted successfully.";
 
-}
+}  
+   logger.warn("Site not found for deletion with ID: {}", id);
 
 throw new  ResourceNotFoundException("Site not found with ID: " + id);
 

@@ -25,11 +25,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import com.keystone.backend.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
 
 
 @Service
 public class WorkOrderService {
+
+        private static final Logger logger =
+        LoggerFactory.getLogger(WorkOrderService.class);
 
     private final WorkOrderRepository workOrderRepository;
     private final SiteRepository siteRepository;
@@ -48,6 +53,8 @@ public class WorkOrderService {
     this.historyRepository = historyRepository;
 }
     public WorkOrderResponse createWorkOrder(CreateWorkOrderRequest request) {
+
+        logger.info("Creating work order: {}", request.getTitle());
 
         System.out.println("========== REQUEST ==========");
     System.out.println("Title      : " + request.getTitle());
@@ -72,6 +79,8 @@ public class WorkOrderService {
 
     WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
 
+    logger.info("Work order created successfully with ID: {}", savedWorkOrder.getId());
+
     return mapToResponse(savedWorkOrder);
 }
   public List<WorkOrderResponse> getAllWorkOrders() {
@@ -84,19 +93,32 @@ public class WorkOrderService {
 
 public WorkOrderResponse getWorkOrderById(Long id) {
 
+        logger.info("Fetching work order with ID: {}", id);
+
     WorkOrder workOrder = workOrderRepository.findById(id)
-            .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
+             .orElseThrow(() -> {
+    logger.warn("Work order not found with ID: {}", id);
+    return new ResourceNotFoundException("Work Order not found with ID: " + id);
+});
+
+            logger.info("Work order found with ID: {}", id);
 
     return mapToResponse(workOrder);
 }
 
 public WorkOrderResponse updateWorkOrder(Long id, CreateWorkOrderRequest request) {
 
+        logger.info("Updating work order with ID: {}", id);
+
     WorkOrder workOrder = workOrderRepository.findById(id)
-            .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
+        .orElseThrow(() -> {
+            logger.warn("Work order not found for update with ID: {}", id);
+            return new ResourceNotFoundException("Work Order not found with ID: " + id);
+        });
 
-          String oldStatus = workOrder.getStatus();  
+logger.info("Work order found for update with ID: {}", id);
 
+String oldStatus = workOrder.getStatus();
     Site site = siteRepository.findById(request.getSiteId())
             .orElseThrow(() -> new  ResourceNotFoundException("Site not found"));
 
@@ -108,6 +130,10 @@ public WorkOrderResponse updateWorkOrder(Long id, CreateWorkOrderRequest request
     workOrder.setSite(site);
 
     WorkOrder updatedWorkOrder = workOrderRepository.save(workOrder);
+    
+    logger.info("Work order updated successfully with ID: {}", id);
+
+     
 
 
 
@@ -144,14 +170,22 @@ public WorkOrderResponse updateWorkOrder(Long id, CreateWorkOrderRequest request
     return mapToResponse(updatedWorkOrder);
 }
 
-  public void deleteWorkOrder(Long id) {
+   public void deleteWorkOrder(Long id) {
+
+    logger.info("Deleting work order with ID: {}", id);
 
     WorkOrder workOrder = workOrderRepository.findById(id)
-            .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
+            .orElseThrow(() -> {
+                logger.warn("Work order not found for deletion with ID: {}", id);
+                return new ResourceNotFoundException("Work Order not found with ID: " + id);
+            });
+
+    logger.info("Work order found for deletion with ID: {}", id);
 
     workOrderRepository.delete(workOrder);
-}
 
+    logger.info("Work order deleted successfully with ID: {}", id);
+}
  
  public List<WorkOrderResponse> getWorkOrdersByStatus(String status) {
 

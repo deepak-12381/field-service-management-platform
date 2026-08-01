@@ -15,9 +15,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
 import com.keystone.backend.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class CustomerService {
+
+        private static final Logger logger =
+        LoggerFactory.getLogger(CustomerService.class);
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -26,6 +31,8 @@ public class CustomerService {
 private UserRepository userRepository;
 
 public CustomerResponse createCustomer(CreateCustomerRequest request) {
+
+         logger.info("Creating customer: {}", request.getCustomerName());
 
    Customer customer = new Customer();
 
@@ -45,6 +52,8 @@ User user = (User) authentication.getPrincipal();
 customer.setCreatedBy(user.getEmail());
 
 customer = customerRepository.save(customer);
+
+  logger.info("Customer created successfully with ID: {}", customer.getId());
 
 
 
@@ -82,11 +91,15 @@ public List<CustomerResponse> getAllCustomers() {
 }
   public CustomerResponse getCustomerById(Long id) {
 
+        logger.info("Fetching customer with ID: {}", id);
+
      Optional<Customer> optionalCustomer = customerRepository.findById(id);
      
      if (optionalCustomer.isPresent()) {
 
         Customer customer = optionalCustomer.get();
+
+        logger.info("Customer found with ID: {}", id);
 
         return new CustomerResponse(
         customer.getId(),
@@ -100,10 +113,14 @@ public List<CustomerResponse> getAllCustomers() {
 );
 
 }
+   
+logger.warn("Customer not found with ID: {}", id);
      throw new ResourceNotFoundException("Customer not found with ID: " + id);
 }
 
 public CustomerResponse updateCustomer(Long id, CreateCustomerRequest request) {
+
+        logger.info("Updating customer with ID: {}", id);
 
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
      
@@ -122,6 +139,8 @@ customer.setState(request.getState());
 customer.setPincode(request.getPincode());
 
 customerRepository.save(customer);
+
+  logger.info("Customer updated successfully with ID: {}", id);
 
 
   return new CustomerResponse(
@@ -144,6 +163,8 @@ customerRepository.save(customer);
   
 public String deleteCustomer(Long id) {
 
+        logger.info("Deleting customer with ID: {}", id);
+
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
 
         if (optionalCustomer.isPresent()) {
@@ -151,6 +172,8 @@ public String deleteCustomer(Long id) {
                 Customer customer = optionalCustomer.get();
 
                 customerRepository.delete(customer);
+
+                logger.info("Customer deleted successfully with ID: {}", id);
 
                 return "Customer deleted successfully.";
 
