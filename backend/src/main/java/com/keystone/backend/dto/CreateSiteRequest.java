@@ -1,14 +1,30 @@
  package com.keystone.backend.dto;
+ import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public class CreateSiteRequest {
 
-    private String siteName;
-    private String address;
-    private String city;
-    private String state;
-    private String pincode;
-    private Long customerId;
+     
+     
+    @NotBlank(message = "Site name is required")
+private String siteName;
 
+@NotBlank(message = "Address is required")
+private String address;
+
+@NotBlank(message = "City is required")
+private String city;
+
+@NotBlank(message = "State is required")
+private String state;
+
+@NotBlank(message = "Pincode is required")
+@Pattern(regexp = "^[0-9]{6}$", message = "Pincode must be exactly 6 digits")
+private String pincode;
+
+@NotNull(message = "Customer ID is required")
+private Long customerId;
     public CreateSiteRequest() {
     }
 

@@ -3,6 +3,9 @@
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.keystone.backend.service.CustomerService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import com.keystone.backend.dto.CreateCustomerRequest;
 import com.keystone.backend.dto.CustomerResponse;
@@ -24,7 +27,8 @@ public class CustomerController {
 
 
     @PostMapping
-public CustomerResponse createCustomer(@RequestBody CreateCustomerRequest request) {
+   public CustomerResponse createCustomer(
+        @Valid @RequestBody CreateCustomerRequest request) {
 
     return customerService.createCustomer(request);
 

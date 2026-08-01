@@ -10,6 +10,7 @@ import com.keystone.backend.dto.AssignTechnicianRequest;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/workorders")
@@ -22,7 +23,8 @@ public class WorkOrderController {
     }
 
     @PostMapping
-public WorkOrderResponse createWorkOrder(@RequestBody CreateWorkOrderRequest request) {
+  public WorkOrderResponse createWorkOrder(
+        @Valid @RequestBody CreateWorkOrderRequest request) {
 
     return workOrderService.createWorkOrder(request);
 }
@@ -64,9 +66,9 @@ public List<WorkOrderResponse> getWorkOrdersBySite(
 }
 
 @PutMapping("/{id}")
-public WorkOrderResponse updateWorkOrder(
+   public WorkOrderResponse updateWorkOrder(
         @PathVariable Long id,
-        @RequestBody CreateWorkOrderRequest request) {
+        @Valid @RequestBody CreateWorkOrderRequest request) {
 
     return workOrderService.updateWorkOrder(id, request);
 }

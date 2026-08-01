@@ -1,13 +1,26 @@
  package com.keystone.backend.dto;
+ import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class CreateWorkOrderRequest {
 
-    private String title;
-    private String description;
-    private String priority;
-    private String status;
-    private String createdBy;
-    private Long siteId;
+     @NotBlank(message = "Title is required")
+private String title;
+
+@NotBlank(message = "Description is required")
+private String description;
+
+@NotBlank(message = "Priority is required")
+private String priority;
+
+@NotBlank(message = "Status is required")
+private String status;
+
+@NotBlank(message = "Created by is required")
+private String createdBy;
+
+@NotNull(message = "Site ID is required")
+private Long siteId;
 
     public CreateWorkOrderRequest() {
     }

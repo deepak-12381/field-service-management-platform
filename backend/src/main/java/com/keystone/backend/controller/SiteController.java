@@ -7,6 +7,8 @@ import com.keystone.backend.dto.SiteResponse;
 import com.keystone.backend.service.SiteService;
 import com.keystone.backend.util.JwtUtil;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +27,9 @@ public class SiteController {
 
 
     @PostMapping
-public SiteResponse createSite(
-        @RequestBody CreateSiteRequest request,
-        Authentication authentication) {
+    public SiteResponse createSite(
+        @Valid @RequestBody CreateSiteRequest request,
+        Authentication authentication)  {
 
     String email = authentication.getName();
 
