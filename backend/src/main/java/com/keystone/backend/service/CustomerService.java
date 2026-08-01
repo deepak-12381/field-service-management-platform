@@ -30,7 +30,7 @@ public class CustomerService {
     @Autowired
 private UserRepository userRepository;
 
-public CustomerResponse createCustomer(CreateCustomerRequest request) {
+ public CustomerResponse createCustomer(CreateCustomerRequest request, String createdBy) {
 
          logger.info("Creating customer: {}", request.getCustomerName());
 
@@ -46,10 +46,7 @@ customer.setPincode(request.getPincode());
 
 customer.setCreatedAt(LocalDateTime.now());
 
-Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-User user = (User) authentication.getPrincipal();
-
-customer.setCreatedBy(user.getEmail());
+ customer.setCreatedBy(createdBy);
 
 customer = customerRepository.save(customer);
 

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -26,12 +27,14 @@ public class CustomerController {
     private CustomerService customerService;
 
 
-    @PostMapping
-   public CustomerResponse createCustomer(
-        @Valid @RequestBody CreateCustomerRequest request) {
+       @PostMapping
+public CustomerResponse createCustomer(
+        @Valid @RequestBody CreateCustomerRequest request,
+        Authentication authentication) {
 
-    return customerService.createCustomer(request);
+    String email = authentication.getName();
 
+    return customerService.createCustomer(request, email);
 }
 
 @GetMapping
