@@ -11,6 +11,9 @@ import com.keystone.backend.dto.SiteResponse;
 import com.keystone.backend.entity.Customer;
 import com.keystone.backend.entity.Site;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
@@ -59,10 +62,11 @@ public SiteResponse createSite(CreateSiteRequest request, String createdBy) {
   site.setCreatedAt(LocalDateTime.now());
    site.setCreatedBy(createdBy);
 
-   site.setCustomer(customer);
-   siteRepository.save(site);
+    site.setCustomer(customer);
 
-    logger.info("Site created successfully with ID: {}", site.getId());
+site = siteRepository.save(site);
+
+logger.info("Site created successfully with ID: {}", site.getId());
 
 
    return new SiteResponse(
@@ -211,4 +215,17 @@ if (optionalSite.isPresent()) {
 throw new  ResourceNotFoundException("Site not found with ID: " + id);
 
 }
+  @Test
+void testDeleteSiteNotFound() {
+
+    when(siteRepository.findById(100L))
+            .thenReturn(Optional.empty());
+
+    assertThrows(
+            ResourceNotFoundException.class,
+            () -> siteService.deleteSite(100L)
+    );
+}
+
+
 }
