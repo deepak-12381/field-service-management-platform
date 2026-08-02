@@ -24,7 +24,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 import java.util.ArrayList;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+ 
 @ExtendWith(MockitoExtension.class)
 class SiteServiceTest {
 
@@ -90,7 +94,7 @@ void testCreateSiteCustomerNotFound() {
     );
 }
 
-  @Test
+   @Test
 void testGetAllSites() {
 
     Customer customer = new Customer();
@@ -109,15 +113,18 @@ void testGetAllSites() {
     List<Site> siteList = new ArrayList<>();
     siteList.add(site);
 
-    when(siteRepository.findAll()).thenReturn(siteList);
+    Page<Site> page = new PageImpl<>(siteList);
 
-    List<SiteResponse> response = siteService.getAllSites();
+    when(siteRepository.findAll(any(Pageable.class)))
+            .thenReturn(page);
 
-    assertEquals(1, response.size());
-    assertEquals("ABC Site", response.get(0).getSiteName());
-    assertEquals("ABC Pvt Ltd", response.get(0).getCustomerName());
+    Page<SiteResponse> response =
+            siteService.getAllSites(0, 10, "siteName", "asc");
+
+    assertEquals(1, response.getTotalElements());
+    assertEquals("ABC Site", response.getContent().get(0).getSiteName());
+    assertEquals("ABC Pvt Ltd", response.getContent().get(0).getCustomerName());
 }
-
 @Test
 void testGetSiteByIdSuccess() {
 

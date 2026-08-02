@@ -12,12 +12,14 @@ import com.keystone.backend.dto.CustomerResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import java.util.List;
+ 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -37,11 +39,14 @@ public CustomerResponse createCustomer(
     return customerService.createCustomer(request, email);
 }
 
-@GetMapping
-public List<CustomerResponse> getAllCustomers() {
+  @GetMapping
+public Page<CustomerResponse> getAllCustomers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "customerName") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction) {
 
-    return customerService.getAllCustomers();
-
+    return customerService.getAllCustomers(page, size, sortBy, direction);
 }
 
 

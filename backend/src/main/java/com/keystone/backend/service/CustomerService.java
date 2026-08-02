@@ -17,6 +17,10 @@ import java.util.Optional;
 import com.keystone.backend.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class CustomerService {
@@ -67,24 +71,30 @@ customer = customerRepository.save(customer);
 
 }
 
-public List<CustomerResponse> getAllCustomers() {
+   
+ public Page<CustomerResponse> getAllCustomers(
+        int page,
+        int size,
+        String sortBy,
+        String direction) {
 
-     List<Customer> customers = customerRepository.findAll();
+    Sort sort = direction.equalsIgnoreCase("desc")
+            ? Sort.by(sortBy).descending()
+            : Sort.by(sortBy).ascending();
 
-        
-     return customers.stream()
-        .map(customer -> new CustomerResponse(
-                customer.getId(),
-                customer.getCustomerName(),
-                customer.getEmail(),
-                customer.getPhone(),
-                customer.getAddress(),
-                customer.getCity(),
-                customer.getState(),
-                customer.getPincode()
-        ))
-        .collect(Collectors.toList());
+    Pageable pageable = PageRequest.of(page, size, sort);
 
+    return customerRepository.findAll(pageable)
+            .map(customer -> new CustomerResponse(
+                    customer.getId(),
+                    customer.getCustomerName(),
+                    customer.getEmail(),
+                    customer.getPhone(),
+                    customer.getAddress(),
+                    customer.getCity(),
+                    customer.getState(),
+                    customer.getPincode()
+            ));
 }
   public CustomerResponse getCustomerById(Long id) {
 

@@ -12,7 +12,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+ 
+import org.springframework.data.domain.Page;
 
  
 @RestController
@@ -36,11 +37,14 @@ public class SiteController {
     return siteService.createSite(request, email);
 }
 
- @GetMapping
-public List<SiteResponse> getAllSites() {
+  @GetMapping
+public Page<SiteResponse> getAllSites(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "siteName") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction) {
 
-    return siteService.getAllSites();
-
+    return siteService.getAllSites(page, size, sortBy, direction);
 }
 
 @GetMapping("/{id}")

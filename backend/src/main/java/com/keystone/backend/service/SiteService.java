@@ -13,12 +13,15 @@ import com.keystone.backend.entity.Site;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.List;
-import java.util.ArrayList;
+ 
 import com.keystone.backend.exception.ResourceNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class SiteService {
@@ -85,16 +88,20 @@ logger.info("Site created successfully with ID: {}", site.getId());
 );
 }
 
-public List<SiteResponse>  getAllSites(){
+   public Page<SiteResponse> getAllSites(
+        int page,
+        int size,
+        String sortBy,
+        String direction) {
 
-    List<Site> sites = siteRepository.findAll();
+    Sort sort = direction.equalsIgnoreCase("desc")
+            ? Sort.by(sortBy).descending()
+            : Sort.by(sortBy).ascending();
 
-List<SiteResponse> responseList = new ArrayList<>();
+    Pageable pageable = PageRequest.of(page, size, sort);
 
-for (Site site : sites) {
-
-    responseList.add(
-            new SiteResponse(
+    return siteRepository.findAll(pageable)
+            .map(site -> new SiteResponse(
                     site.getId(),
                     site.getSiteName(),
                     site.getAddress(),
@@ -102,12 +109,7 @@ for (Site site : sites) {
                     site.getState(),
                     site.getPincode(),
                     site.getCustomer().getCustomerName()
-            )
-    );
-
-}
-   return responseList;
-
+            ));
 }
 
 
