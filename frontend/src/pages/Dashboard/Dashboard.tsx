@@ -1,4 +1,8 @@
 import Grid from "@mui/material/Grid";
+import { useEffect, useState } from "react";
+import { getWorkOrders } from "../../services/workOrderService";
+import { getDashboardData, type DashboardData } from "../../services/dashboardService";
+import type { WorkOrder } from "../../types/workOrder";
 import {
   Avatar,
   Box,
@@ -32,84 +36,9 @@ import {
   Work as WorkIcon,
 } from '@mui/icons-material';
 
-const kpiData = [
-  {
-    label: 'Total Customers',
-    value: '1,280',
-    icon: <GroupsIcon fontSize="medium" sx={{ color: 'primary.main' }} />,
-    detail: 'Customer accounts tracked',
-  },
-  {
-    label: 'Total Sites',
-    value: '445',
-    icon: <PlaceIcon fontSize="medium" sx={{ color: 'primary.main' }} />,
-    detail: 'Active service locations',
-  },
-  {
-    label: 'Active Work Orders',
-    value: '76',
-    icon: <WorkIcon fontSize="medium" sx={{ color: 'primary.main' }} />,
-    detail: 'Open assignments',
-  },
-  {
-    label: 'Completed Orders',
-    value: '1,132',
-    icon: <DescriptionIcon fontSize="medium" sx={{ color: 'primary.main' }} />,
-    detail: 'Closed in the last 30 days',
-  },
-  {
-    label: 'Pending Orders',
-    value: '18',
-    icon: <BarChartIcon fontSize="medium" sx={{ color: 'primary.main' }} />,
-    detail: 'Awaiting customer approval',
-  },
-  {
-    label: 'Technicians',
-    value: '52',
-    icon: <BuildIcon fontSize="medium" sx={{ color: 'primary.main' }} />,
-    detail: 'Skilled field staff available',
-  },
-];
+ 
 
-const workOrders = [
-  {
-    id: 'WO-1087',
-    customer: 'Greenfield Manufacturing',
-    site: 'Warehouse 12',
-    priority: 'High',
-    status: 'In Progress',
-    technician: 'A. Johnson',
-    date: '2026-08-05',
-  },
-  {
-    id: 'WO-1074',
-    customer: 'Northgate Logistics',
-    site: 'Distribution Center',
-    priority: 'Medium',
-    status: 'Scheduled',
-    technician: 'M. Patel',
-    date: '2026-08-04',
-  },
-  {
-    id: 'WO-1062',
-    customer: 'Broadway Retail',
-    site: 'Flagship Store',
-    priority: 'Low',
-    status: 'Completed',
-    technician: 'S. Lee',
-    date: '2026-08-03',
-  },
-  {
-    id: 'WO-1059',
-    customer: 'Centra Telecom',
-    site: 'Service Hub',
-    priority: 'High',
-    status: 'Pending Review',
-    technician: 'D. Taylor',
-    date: '2026-08-02',
-  },
-];
-
+  
 const activityItems = [
   {
     time: '08:30 AM',
@@ -156,13 +85,73 @@ const notifications = [
   },
 ];
 
-const Dashboard = () => {
-  const loading = false;
+   const Dashboard = () => {
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [recentWorkOrders, setRecentWorkOrders] = useState<WorkOrder[]>([]);
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        const data = await getDashboardData();
+        setDashboardData(data);
+
+        const workOrderData = await getWorkOrders(0, 4);
+setRecentWorkOrders(workOrderData.content);
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, []);
+
+  const kpiData = [
+    {
+      label: "Total Customers",
+      value: dashboardData?.totalCustomers ?? 0,
+      icon: <GroupsIcon fontSize="medium" sx={{ color: "primary.main" }} />,
+      detail: "Customer accounts tracked",
+    },
+    {
+      label: "Total Sites",
+      value: dashboardData?.totalSites ?? 0,
+      icon: <PlaceIcon fontSize="medium" sx={{ color: "primary.main" }} />,
+      detail: "Active service locations",
+    },
+    {
+      label: "Active Work Orders",
+      value: dashboardData?.inProgressWorkOrders ?? 0,
+      icon: <WorkIcon fontSize="medium" sx={{ color: "primary.main" }} />,
+      detail: "Currently in progress",
+    },
+    {
+      label: "Completed Orders",
+      value: dashboardData?.completedWorkOrders ?? 0,
+      icon: <DescriptionIcon fontSize="medium" sx={{ color: "primary.main" }} />,
+      detail: "Completed work orders",
+    },
+    {
+      label: "Pending Orders",
+      value: dashboardData?.openWorkOrders ?? 0,
+      icon: <BarChartIcon fontSize="medium" sx={{ color: "primary.main" }} />,
+      detail: "Open work orders",
+    },
+    {
+      label: "Technicians",
+      value: dashboardData?.totalTechnicians ?? 0,
+      icon: <BuildIcon fontSize="medium" sx={{ color: "primary.main" }} />,
+      detail: "Registered technicians",
+    },
+  ];
+
   const currentDate = new Date().toLocaleDateString(undefined, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 
   return (
@@ -247,7 +236,7 @@ const Dashboard = () => {
                     <TableHead>
                       <TableRow>
                         <TableCell sx={{ color: 'text.secondary', fontWeight: 700 }}>Work Order ID</TableCell>
-                        <TableCell sx={{ color: 'text.secondary', fontWeight: 700 }}>Customer</TableCell>
+                        <TableCell sx={{ color: 'text.secondary', fontWeight: 700 }}>Title</TableCell>
                         <TableCell sx={{ color: 'text.secondary', fontWeight: 700 }}>Site</TableCell>
                         <TableCell sx={{ color: 'text.secondary', fontWeight: 700 }}>Priority</TableCell>
                         <TableCell sx={{ color: 'text.secondary', fontWeight: 700 }}>Status</TableCell>
@@ -267,23 +256,63 @@ const Dashboard = () => {
                           </TableRow>
                         ))
                       ) : (
-                        workOrders.map((order) => (
-                          <TableRow key={order.id} sx={{ '&:hover': { backgroundColor: 'action.hover' } }}>
-                            <TableCell>{order.id}</TableCell>
-                            <TableCell>{order.customer}</TableCell>
-                            <TableCell>{order.site}</TableCell>
-                            <TableCell>{order.priority}</TableCell>
-                            <TableCell>
-                              <Chip
-                                label={order.status}
-                                size="small"
-                                color={order.status === 'Completed' ? 'success' : order.status === 'Scheduled' ? 'info' : order.status === 'Pending Review' ? 'warning' : 'primary'}
-                                sx={{ textTransform: 'capitalize' }}
-                              />
-                            </TableCell>
-                            <TableCell>{order.technician}</TableCell>
-                            <TableCell>{order.date}</TableCell>
-                          </TableRow>
+                         recentWorkOrders.map((order) => (
+                           <TableRow
+  key={order.id}
+  sx={{ '&:hover': { backgroundColor: 'action.hover' } }}
+>
+  <TableCell>{`WO-${order.id}`}</TableCell>
+
+  <TableCell>
+    {order.title}
+  </TableCell>
+
+  <TableCell>
+    {order.siteName ?? "—"}
+  </TableCell>
+
+  <TableCell>
+    <Chip
+      label={order.priority}
+      size="small"
+      color={
+        order.priority?.toUpperCase() === "HIGH"
+          ? "error"
+          : order.priority?.toUpperCase() === "MEDIUM"
+            ? "warning"
+            : "default"
+      }
+      sx={{ textTransform: "capitalize" }}
+    />
+  </TableCell>
+
+  <TableCell>
+    <Chip
+      label={order.status}
+      size="small"
+      color={
+        order.status?.toUpperCase() === "COMPLETED"
+          ? "success"
+          : order.status?.toUpperCase() === "IN_PROGRESS"
+            ? "primary"
+            : order.status?.toUpperCase() === "OPEN"
+              ? "info"
+              : "warning"
+      }
+      sx={{ textTransform: "capitalize" }}
+    />
+  </TableCell>
+
+  <TableCell>
+    {order.technicianName ?? "Unassigned"}
+  </TableCell>
+
+  <TableCell>
+    {order.createdAt
+      ? new Date(order.createdAt).toLocaleDateString()
+      : "—"}
+  </TableCell>
+</TableRow>
                         ))
                       )}
                     </TableBody>

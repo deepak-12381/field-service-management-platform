@@ -39,14 +39,25 @@ public CustomerResponse createCustomer(
     return customerService.createCustomer(request, email);
 }
 
-  @GetMapping
+   @GetMapping
 public Page<CustomerResponse> getAllCustomers(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(defaultValue = "customerName") String sortBy,
-        @RequestParam(defaultValue = "asc") String direction) {
+        @RequestParam(defaultValue = "asc") String direction,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) String city,
+        @RequestParam(required = false) String state) {
 
-    return customerService.getAllCustomers(page, size, sortBy, direction);
+    return customerService.getAllCustomers(
+            page,
+            size,
+            sortBy,
+            direction,
+            search,
+            city,
+            state
+    );
 }
 
 

@@ -1,6 +1,13 @@
  package com.keystone.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
@@ -18,6 +25,15 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column
+    private String phone;
+
+    @Column(length = 1000)
+    private String skills;
+
+    @Column(nullable = false)
+    private String status = "Active";
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -64,6 +80,30 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getSkills() {
+        return skills;
+    }
+
+    public void setSkills(String skills) {
+        this.skills = skills;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Role getRole() {

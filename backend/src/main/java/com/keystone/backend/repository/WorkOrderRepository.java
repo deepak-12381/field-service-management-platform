@@ -8,16 +8,11 @@ import java.util.List;
 
 @Repository
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
- long countByStatus(String status);
-
-long countByPriority(String priority);
-
-List<WorkOrder> findByStatus(String status);
-
-List<WorkOrder> findByPriority(String priority);
-
-List<WorkOrder> findByTechnician_Id(Long technicianId);
-
-List<WorkOrder> findBySite_Id(Long siteId);
-
+    long countByStatus(String status);
+    long countByPriority(String priority);
+    List<WorkOrder> findByStatus(String status);
+    List<WorkOrder> findByPriority(String priority);
+    List<WorkOrder> findByTechnician_Id(Long technicianId);
+    List<WorkOrder> findBySite_Id(Long siteId);
+    List<WorkOrder> findByTitleContainingIgnoreCase(String title); 
 }

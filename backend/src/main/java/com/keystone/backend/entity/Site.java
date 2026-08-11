@@ -1,135 +1,116 @@
  package com.keystone.backend.entity;
+
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import java.time.LocalDateTime;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "sites")
 public class Site {
 
     @Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-private String siteName;
+    private String siteName;
+    private String address;
+    private String city;
+    private String state;
+    private String pincode;
+    private String status = "Active";
+    private LocalDateTime createdAt;
+    private String createdBy;
 
-private String address;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-private String city;
+    public Site() {
+    }
 
-private String state;
+    public Long getId() {
+        return id;
+    }
 
-private String pincode;
-    
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-private LocalDateTime createdAt;
+    public String getSiteName() {
+        return siteName;
+    }
 
-private String createdBy;
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
 
+    public String getAddress() {
+        return address;
+    }
 
-@ManyToOne
-@JoinColumn(name = "customer_id")
-private Customer customer;
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
+    public String getCity() {
+        return city;
+    }
 
-public Long getId() {
-    return id;
-}
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-public void setId(Long id) {
-    this.id = id;
-}
+    public String getState() {
+        return state;
+    }
 
-public String getSiteName() {
-    return siteName;
-}
+    public void setState(String state) {
+        this.state = state;
+    }
 
-public void setSiteName(String siteName) {
-    this.siteName = siteName;
-}
+    public String getPincode() {
+        return pincode;
+    }
 
-public String getAddress() {
-    return address;
-}
+    public void setPincode(String pincode) {
+        this.pincode = pincode;
+    }
 
-public void setAddress(String address) {
-    this.address = address;
-}
+    public String getStatus() {
+        return status;
+    }
 
-public String getCity() {
-    return city;
-}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-public void setCity(String city) {
-    this.city = city;
-}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-public String getState() {
-    return state;
-}
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-public void setState(String state) {
-    this.state = state;
-}
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-public String getPincode() {
-    return pincode;
-}
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-public void setPincode(String pincode) {
-    this.pincode = pincode;
-}
+    public Customer getCustomer() {
+        return customer;
+    }
 
-public LocalDateTime getCreatedAt() {
-    return createdAt;
-}
-
-public void setCreatedAt(LocalDateTime createdAt) {
-    this.createdAt = createdAt;
-}
-
-public String getCreatedBy() {
-    return createdBy;
-}
-
-public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-}
-
-public Customer getCustomer() {
-    return customer;
-}
-
-public void setCustomer(Customer customer) {
-    this.customer = customer;
-}
-
-  
-public Site() {
-}
-
-public Site(Long id, String siteName, String address, String city,
-            String state, String pincode, LocalDateTime createdAt,
-            String createdBy, Customer customer) {
-
-    this.id = id;
-    this.siteName = siteName;
-    this.address = address;
-    this.city = city;
-    this.state = state;
-    this.pincode = pincode;
-    this.createdAt = createdAt;
-    this.createdBy = createdBy;
-    this.customer = customer;
-}
-
-
-
-
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 }

@@ -72,11 +72,14 @@ customer = customerRepository.save(customer);
 }
 
    
- public Page<CustomerResponse> getAllCustomers(
+  public Page<CustomerResponse> getAllCustomers(
         int page,
         int size,
         String sortBy,
-        String direction) {
+        String direction,
+        String search,
+        String city,
+        String state) {
 
     Sort sort = direction.equalsIgnoreCase("desc")
             ? Sort.by(sortBy).descending()
@@ -84,17 +87,81 @@ customer = customerRepository.save(customer);
 
     Pageable pageable = PageRequest.of(page, size, sort);
 
-    return customerRepository.findAll(pageable)
-            .map(customer -> new CustomerResponse(
-                    customer.getId(),
-                    customer.getCustomerName(),
-                    customer.getEmail(),
-                    customer.getPhone(),
-                    customer.getAddress(),
-                    customer.getCity(),
-                    customer.getState(),
-                    customer.getPincode()
-            ));
+    boolean hasSearch = search != null && !search.trim().isEmpty();
+    boolean hasCity = city != null && !city.trim().isEmpty();
+    boolean hasState = state != null && !state.trim().isEmpty();
+
+    Page<Customer> customerPage;
+
+    if (hasSearch && hasCity && hasState) {
+
+        customerPage = customerRepository.findBySearchAndCityAndState(
+                search.trim(),
+                city.trim(),
+                state.trim(),
+                pageable
+        );
+
+    } else if (hasSearch && hasCity) {
+
+        customerPage = customerRepository.findBySearchAndCity(
+                search.trim(),
+                city.trim(),
+                pageable
+        );
+
+    } else if (hasSearch && hasState) {
+
+        customerPage = customerRepository.findBySearchAndState(
+                search.trim(),
+                state.trim(),
+                pageable
+        );
+
+    } else if (hasCity && hasState) {
+
+        customerPage = customerRepository.findByCityAndState(
+                city.trim(),
+                state.trim(),
+                pageable
+        );
+
+    } else if (hasSearch) {
+
+        customerPage = customerRepository.findBySearch(
+                search.trim(),
+                pageable
+        );
+
+    } else if (hasCity) {
+
+        customerPage = customerRepository.findByCityContainingIgnoreCase(
+                city.trim(),
+                pageable
+        );
+
+    } else if (hasState) {
+
+        customerPage = customerRepository.findByStateContainingIgnoreCase(
+                state.trim(),
+                pageable
+        );
+
+    } else {
+
+        customerPage = customerRepository.findAll(pageable);
+    }
+
+    return customerPage.map(customer -> new CustomerResponse(
+            customer.getId(),
+            customer.getCustomerName(),
+            customer.getEmail(),
+            customer.getPhone(),
+            customer.getAddress(),
+            customer.getCity(),
+            customer.getState(),
+            customer.getPincode()
+    ));
 }
   public CustomerResponse getCustomerById(Long id) {
 

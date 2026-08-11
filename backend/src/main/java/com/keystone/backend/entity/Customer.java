@@ -1,4 +1,5 @@
  package com.keystone.backend.entity;
+
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -12,20 +13,39 @@ import jakarta.persistence.Table;
 @Table(name = "customers")
 public class Customer {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public Customer(Long id, String customerName, String email, String phone, String address, String city, String state,
-            String pincode, LocalDateTime createdAt, String createdBy) {
-        this.id = id;
-        this.customerName = customerName;
-        this.email = email;
-        this.phone = phone;
-        this.address = address;
-        this.city = city;
-        this.state = state;
-        this.pincode = pincode;
-        this.createdAt = createdAt;
-        this.createdBy = createdBy;
-    }
+    @Column(nullable = false)
+    private String customerName;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, unique = true)
+    private String phone;
+
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
+    private String city;
+
+    @Column(nullable = false)
+    private String state;
+
+    @Column(nullable = false)
+    private String pincode;
+
+    @Column(nullable = false)
+    private String status = "Active";
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private String createdBy;
 
     public Customer() {
     }
@@ -94,6 +114,14 @@ public class Customer {
         this.pincode = pincode;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -109,37 +137,6 @@ public class Customer {
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
-
-    @Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
-
-  @Column(nullable = false)
-private String customerName;
-
- @Column(nullable = false, unique = true)
-private String email;
-
-@Column(nullable = false, unique = true)
-private String phone;
-
-@Column(nullable = false)
-private String address;
-
-@Column(nullable = false)
-private String city;
-
-@Column(nullable = false)
-private String state;
-
-@Column(nullable = false)
-private String pincode;
-
-@Column(nullable = false)
-private LocalDateTime createdAt;
-
-@Column(nullable = false)
-private String createdBy;
 }
 
 
