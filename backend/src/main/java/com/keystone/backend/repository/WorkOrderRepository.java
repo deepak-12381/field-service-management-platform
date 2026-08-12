@@ -10,6 +10,7 @@ import java.util.List;
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
     long countByStatus(String status);
     long countByPriority(String priority);
+    long countByTechnician_Id(Long technicianId);
     List<WorkOrder> findByStatus(String status);
     List<WorkOrder> findByPriority(String priority);
     List<WorkOrder> findByTechnician_Id(Long technicianId);

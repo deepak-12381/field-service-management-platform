@@ -117,5 +117,42 @@ CREATE TABLE IF NOT EXISTS work_order_status_history (
     CONSTRAINT fk_status_history_work_orders FOREIGN KEY (work_order_id) REFERENCES work_orders (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- ----------------------------------------------------------------------------
+-- Table: work_order_parts
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS work_order_parts (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    work_order_id BIGINT NOT NULL,
+    part_name VARCHAR(255) NOT NULL,
+    part_number VARCHAR(255) DEFAULT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    unit_cost DECIMAL(10, 2) DEFAULT NULL,
+    notes VARCHAR(1000) DEFAULT NULL,
+    created_at DATETIME(6) NOT NULL,
+    created_by VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    KEY idx_work_order_parts_work_order_id (work_order_id),
+    CONSTRAINT fk_work_order_parts_work_orders FOREIGN KEY (work_order_id) REFERENCES work_orders (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------------------------------------------------------
+-- Table: time_logs
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS time_logs (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    work_order_id BIGINT NOT NULL,
+    technician_id BIGINT NOT NULL,
+    start_time DATETIME(6) NOT NULL,
+    end_time DATETIME(6) DEFAULT NULL,
+    hours_logged DECIMAL(8, 2) DEFAULT NULL,
+    notes VARCHAR(1000) DEFAULT NULL,
+    created_at DATETIME(6) NOT NULL,
+    PRIMARY KEY (id),
+    KEY idx_time_logs_work_order_id (work_order_id),
+    KEY idx_time_logs_technician_id (technician_id),
+    CONSTRAINT fk_time_logs_work_orders FOREIGN KEY (work_order_id) REFERENCES work_orders (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_time_logs_technicians FOREIGN KEY (technician_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;

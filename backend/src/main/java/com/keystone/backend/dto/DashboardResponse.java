@@ -13,6 +13,9 @@ public class DashboardResponse {
     private long openWorkOrders;
     private long inProgressWorkOrders;
     private long completedWorkOrders;
+    private long assignedWorkOrders;
+    private long onHoldWorkOrders;
+    private long closedWorkOrders;
 
     private long highPriorityWorkOrders;
 }

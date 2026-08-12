@@ -1,9 +1,13 @@
  package com.keystone.backend.service;
 
 import com.keystone.backend.dto.CreateWorkOrderRequest;
+import com.keystone.backend.dto.UpdateWorkOrderStatusRequest;
 import com.keystone.backend.dto.WorkOrderResponse;
 import com.keystone.backend.entity.Site;
 import com.keystone.backend.entity.WorkOrder;
+import com.keystone.backend.exception.InvalidStatusTransitionException;
+import com.keystone.backend.exception.ResourceNotFoundException;
+import com.keystone.backend.model.WorkOrderStatus;
 import com.keystone.backend.repository.SiteRepository;
 import com.keystone.backend.repository.WorkOrderRepository;
 import com.keystone.backend.repository.WorkOrderStatusHistoryRepository;
@@ -24,10 +28,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import com.keystone.backend.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
- 
+
 
 
 @Service
@@ -56,28 +59,22 @@ public class WorkOrderService {
 
         logger.info("Creating work order: {}", request.getTitle());
 
-        System.out.println("========== REQUEST ==========");
-    System.out.println("Title      : " + request.getTitle());
-    System.out.println("Description: " + request.getDescription());
-    System.out.println("Priority   : " + request.getPriority());
-    System.out.println("Status     : " + request.getStatus());
-    System.out.println("CreatedBy  : " + request.getCreatedBy());
-    System.out.println("SiteId     : " + request.getSiteId());
-
-
     Site site = siteRepository.findById(request.getSiteId())
             .orElseThrow(() -> new  ResourceNotFoundException("Site not found"));
+
+    String status = normalizeStatus(request.getStatus(), WorkOrderStatus.NEW.name());
 
     WorkOrder workOrder = new WorkOrder();
     workOrder.setTitle(request.getTitle());
     workOrder.setDescription(request.getDescription());
-    workOrder.setPriority(request.getPriority());
-    workOrder.setStatus(request.getStatus());
+    workOrder.setPriority(request.getPriority().toUpperCase());
+    workOrder.setStatus(status);
     workOrder.setCreatedBy(request.getCreatedBy());
     workOrder.setCreatedAt(LocalDateTime.now());
     workOrder.setSite(site);
 
     WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
+    recordStatusHistory(savedWorkOrder, null, status, request.getCreatedBy());
 
     logger.info("Work order created successfully with ID: {}", savedWorkOrder.getId());
 
@@ -118,44 +115,42 @@ public WorkOrderResponse updateWorkOrder(Long id, CreateWorkOrderRequest request
 
 logger.info("Work order found for update with ID: {}", id);
 
-String oldStatus = workOrder.getStatus();
     Site site = siteRepository.findById(request.getSiteId())
             .orElseThrow(() -> new  ResourceNotFoundException("Site not found"));
 
     workOrder.setTitle(request.getTitle());
     workOrder.setDescription(request.getDescription());
-    workOrder.setPriority(request.getPriority());
-    workOrder.setStatus(request.getStatus());
+    workOrder.setPriority(request.getPriority().toUpperCase());
     workOrder.setCreatedBy(request.getCreatedBy());
     workOrder.setSite(site);
+
+    if (request.getStatus() != null && !request.getStatus().isBlank()) {
+        updateStatus(workOrder, request.getStatus(), request.getCreatedBy());
+    }
 
     WorkOrder updatedWorkOrder = workOrderRepository.save(workOrder);
     
     logger.info("Work order updated successfully with ID: {}", id);
 
-     
-
-
-
-     if (!oldStatus.equals(request.getStatus())) {
-
-    WorkOrderStatusHistory history = new WorkOrderStatusHistory();
-
-    history.setWorkOrder(updatedWorkOrder);
-    history.setOldStatus(oldStatus);
-    history.setNewStatus(request.getStatus());
-    history.setChangedBy(request.getCreatedBy());
-    history.setChangedAt(LocalDateTime.now());
-
-    historyRepository.save(history);
+    return mapToResponse(updatedWorkOrder);
 }
 
+public WorkOrderResponse updateWorkOrderStatus(Long id,
+                                               UpdateWorkOrderStatusRequest request,
+                                               String changedBy) {
+
+    WorkOrder workOrder = workOrderRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Work Order not found with ID: " + id));
+
+    updateStatus(workOrder, request.getStatus(), changedBy);
+    WorkOrder updatedWorkOrder = workOrderRepository.save(workOrder);
     return mapToResponse(updatedWorkOrder);
 }
 
 
   public WorkOrderResponse assignTechnician(Long workOrderId,
-                                          AssignTechnicianRequest request) {
+                                          AssignTechnicianRequest request,
+                                          String changedBy) {
 
     WorkOrder workOrder = workOrderRepository.findById(workOrderId)
             .orElseThrow(() -> new  ResourceNotFoundException("Work Order not found"));
@@ -164,6 +159,10 @@ String oldStatus = workOrder.getStatus();
             .orElseThrow(() -> new  ResourceNotFoundException("Technician not found"));
 
     workOrder.setTechnician(technician);
+
+    if (WorkOrderStatus.NEW.name().equals(workOrder.getStatus())) {
+        updateStatus(workOrder, WorkOrderStatus.ASSIGNED.name(), changedBy);
+    }
 
     WorkOrder updatedWorkOrder = workOrderRepository.save(workOrder);
 
@@ -189,7 +188,7 @@ String oldStatus = workOrder.getStatus();
  
  public List<WorkOrderResponse> getWorkOrdersByStatus(String status) {
 
-    return workOrderRepository.findByStatus(status)
+    return workOrderRepository.findByStatus(normalizeStatus(status, status))
             .stream()
             .map(this::mapToResponse)
             .collect(Collectors.toList());
@@ -197,7 +196,7 @@ String oldStatus = workOrder.getStatus();
 
 public List<WorkOrderResponse> getWorkOrdersByPriority(String priority) {
 
-    return workOrderRepository.findByPriority(priority)
+    return workOrderRepository.findByPriority(priority.toUpperCase())
             .stream()
             .map(this::mapToResponse)
             .collect(Collectors.toList());
@@ -254,6 +253,47 @@ private WorkOrderResponse mapToResponse(WorkOrder workOrder) {
 
     return workOrderRepository.findAll(pageable)
             .map(this::mapToResponse);
+}
+
+private void updateStatus(WorkOrder workOrder, String newStatusValue, String changedBy) {
+    String currentStatusValue = workOrder.getStatus();
+    String normalizedNewStatus = normalizeStatus(newStatusValue, newStatusValue);
+
+    if (currentStatusValue != null && currentStatusValue.equalsIgnoreCase(normalizedNewStatus)) {
+        return;
+    }
+
+    WorkOrderStatus currentStatus = WorkOrderStatus.fromValue(
+            currentStatusValue != null ? currentStatusValue : WorkOrderStatus.NEW.name());
+    WorkOrderStatus targetStatus = WorkOrderStatus.fromValue(normalizedNewStatus);
+
+    if (!currentStatus.canTransitionTo(targetStatus)) {
+        throw new InvalidStatusTransitionException(
+                "Invalid status transition from " + currentStatus.name() + " to " + targetStatus.name());
+    }
+
+    workOrder.setStatus(targetStatus.name());
+    recordStatusHistory(workOrder, currentStatusValue, targetStatus.name(), changedBy);
+}
+
+private void recordStatusHistory(WorkOrder workOrder,
+                                 String oldStatus,
+                                 String newStatus,
+                                 String changedBy) {
+    WorkOrderStatusHistory history = new WorkOrderStatusHistory();
+    history.setWorkOrder(workOrder);
+    history.setOldStatus(oldStatus);
+    history.setNewStatus(newStatus);
+    history.setChangedBy(changedBy);
+    history.setChangedAt(LocalDateTime.now());
+    historyRepository.save(history);
+}
+
+private String normalizeStatus(String status, String defaultStatus) {
+    if (status == null || status.isBlank()) {
+        return defaultStatus;
+    }
+    return WorkOrderStatus.fromValue(status).name();
 }
 
 }

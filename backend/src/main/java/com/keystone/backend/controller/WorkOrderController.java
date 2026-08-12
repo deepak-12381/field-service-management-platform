@@ -2,12 +2,14 @@
 
 import com.keystone.backend.dto.AssignTechnicianRequest;
 import com.keystone.backend.dto.CreateWorkOrderRequest;
+import com.keystone.backend.dto.UpdateWorkOrderStatusRequest;
 import com.keystone.backend.dto.WorkOrderResponse;
 import com.keystone.backend.service.WorkOrderService;
 import org.springframework.web.bind.annotation.*;
 import com.keystone.backend.dto.AssignTechnicianRequest;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import jakarta.validation.Valid;
@@ -76,9 +78,19 @@ public List<WorkOrderResponse> getWorkOrdersBySite(
 @PutMapping("/{workOrderId}/assign")
 public WorkOrderResponse assignTechnician(
         @PathVariable Long workOrderId,
-        @RequestBody AssignTechnicianRequest request) {
+        @RequestBody AssignTechnicianRequest request,
+        Authentication authentication) {
 
-    return workOrderService.assignTechnician(workOrderId, request);
+    return workOrderService.assignTechnician(workOrderId, request, authentication.getName());
+}
+
+@PutMapping("/{id}/status")
+public WorkOrderResponse updateWorkOrderStatus(
+        @PathVariable Long id,
+        @Valid @RequestBody UpdateWorkOrderStatusRequest request,
+        Authentication authentication) {
+
+    return workOrderService.updateWorkOrderStatus(id, request, authentication.getName());
 }
 
 

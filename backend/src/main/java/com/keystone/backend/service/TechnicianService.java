@@ -3,7 +3,9 @@ package com.keystone.backend.service;
 import com.keystone.backend.dto.CreateTechnicianRequest;
 import com.keystone.backend.dto.TechnicianResponse;
 import com.keystone.backend.entity.User;
+import com.keystone.backend.entity.Role;
 import com.keystone.backend.exception.ResourceNotFoundException;
+import com.keystone.backend.repository.RoleRepository;
 import com.keystone.backend.repository.UserRepository;
 import com.keystone.backend.repository.WorkOrderRepository;
 import org.springframework.data.domain.Page;
@@ -17,13 +19,20 @@ public class TechnicianService {
 
     private final UserRepository userRepository;
     private final WorkOrderRepository workOrderRepository;
+    private final RoleRepository roleRepository;
 
-    public TechnicianService(UserRepository userRepository, WorkOrderRepository workOrderRepository) {
+    public TechnicianService(UserRepository userRepository,
+                               WorkOrderRepository workOrderRepository,
+                               RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.workOrderRepository = workOrderRepository;
+        this.roleRepository = roleRepository;
     }
 
     public TechnicianResponse createTechnician(CreateTechnicianRequest request) {
+        Role technicianRole = roleRepository.findByName("TECHNICIAN")
+                .orElseThrow(() -> new ResourceNotFoundException("TECHNICIAN role not found"));
+
         User technician = new User();
         technician.setFullName(request.getFullName());
         technician.setEmail(request.getEmail());
@@ -31,6 +40,7 @@ public class TechnicianService {
         technician.setSkills(request.getSkills());
         technician.setStatus(request.getStatus());
         technician.setPassword("temp-password");
+        technician.setRole(technicianRole);
         technician = userRepository.save(technician);
         return mapToResponse(technician);
     }
@@ -38,7 +48,7 @@ public class TechnicianService {
     public Page<TechnicianResponse> getAllTechnicians(int page, int size, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return userRepository.findAll(pageable).map(this::mapToResponse);
+        return userRepository.findByRole_Name("TECHNICIAN", pageable).map(this::mapToResponse);
     }
 
     public TechnicianResponse getTechnicianById(Long id) {
@@ -62,7 +72,7 @@ public class TechnicianService {
     }
 
     private TechnicianResponse mapToResponse(User technician) {
-        long assigned = workOrderRepository.countByStatus("Pending") + workOrderRepository.countByStatus("Scheduled") + workOrderRepository.countByStatus("In Progress");
+        long assigned = workOrderRepository.countByTechnician_Id(technician.getId());
         return new TechnicianResponse(
                 technician.getId(),
                 technician.getFullName(),

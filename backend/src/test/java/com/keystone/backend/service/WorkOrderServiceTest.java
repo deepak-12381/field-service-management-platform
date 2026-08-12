@@ -54,7 +54,7 @@ void testCreateWorkOrderSuccess() {
     request.setTitle("Network Issue");
     request.setDescription("Internet is down");
     request.setPriority("High");
-    request.setStatus("Open");
+    request.setStatus("NEW");
     request.setCreatedBy("admin@gmail.com");
     request.setSiteId(1L);
 
@@ -112,7 +112,7 @@ void testGetAllWorkOrders() {
     workOrder.setTitle("Network Issue");
     workOrder.setDescription("Internet Down");
     workOrder.setPriority("High");
-    workOrder.setStatus("Open");
+    workOrder.setStatus("NEW");
     workOrder.setCreatedBy("admin@gmail.com");
     workOrder.setSite(site);
 
@@ -141,7 +141,7 @@ void testGetWorkOrderByIdSuccess() {
     workOrder.setTitle("Network Issue");
     workOrder.setDescription("Internet Down");
     workOrder.setPriority("High");
-    workOrder.setStatus("Open");
+    workOrder.setStatus("NEW");
     workOrder.setCreatedBy("admin@gmail.com");
     workOrder.setSite(site);
 
@@ -173,7 +173,7 @@ void testUpdateWorkOrderSuccess() {
     request.setTitle("Updated Work");
     request.setDescription("Updated Description");
     request.setPriority("Medium");
-    request.setStatus("Closed");
+    request.setStatus("CLOSED");
     request.setCreatedBy("admin@gmail.com");
     request.setSiteId(1L);
 
@@ -184,7 +184,7 @@ void testUpdateWorkOrderSuccess() {
     WorkOrder workOrder = new WorkOrder();
     workOrder.setId(1L);
     workOrder.setTitle("Old Work");
-    workOrder.setStatus("Open");
+    workOrder.setStatus("COMPLETED");
     workOrder.setSite(site);
 
     when(workOrderRepository.findById(1L))
@@ -200,7 +200,7 @@ void testUpdateWorkOrderSuccess() {
             workOrderService.updateWorkOrder(1L, request);
 
     assertEquals("Updated Work", response.getTitle());
-    assertEquals("Closed", response.getStatus());
+    assertEquals("CLOSED", response.getStatus());
     assertEquals("ABC Site", response.getSiteName());
 }
 @Test

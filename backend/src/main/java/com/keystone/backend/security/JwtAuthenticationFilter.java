@@ -5,13 +5,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.keystone.backend.util.JwtUtil;
 import com.keystone.backend.repository.UserRepository;
 import com.keystone.backend.entity.User;
 
-import java.util.Collections;
+import java.util.List;
  
 
 
@@ -49,34 +50,22 @@ protected boolean shouldNotFilter(jakarta.servlet.http.HttpServletRequest reques
 }
 
         String jwt = authHeader.substring(7).trim();
-
-        System.out.println("AUTH HEADER = " + authHeader);
-
-        System.out.println("JWT = " + jwt);
-
-        System.out.println("JWT LENGTH = " + jwt.length());
-
          String email = jwtUtil.extractEmail(jwt);
-
-         System.out.println("EMAIL = " + email);
-
          User user = userRepository.findByEmail(email).orElse(null);
 
           if (user != null) {
-
-    System.out.println("USER FOUND = " + user.getEmail());
+    List<SimpleGrantedAuthority> authorities = List.of();
+    if (user.getRole() != null) {
+        authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+    }
 
     UsernamePasswordAuthenticationToken authentication =
             new UsernamePasswordAuthenticationToken(
                     user,
                     null,
-                    Collections.emptyList());
+                    authorities);
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    System.out.println("AUTHENTICATION SET");
-} else {
-    System.out.println("USER NOT FOUND");
 }
 
          filterChain.doFilter(request, response);

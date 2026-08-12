@@ -2,13 +2,24 @@
 
  import com.keystone.backend.dto.LoginRequest;
  import com.keystone.backend.dto.RegisterRequest;
+import com.keystone.backend.dto.UpdateUserRequest;
+import com.keystone.backend.dto.UserResponse;
 import com.keystone.backend.entity.Role;
 import com.keystone.backend.entity.User;
+import com.keystone.backend.exception.BadRequestException;
+import com.keystone.backend.exception.ResourceNotFoundException;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import com.keystone.backend.repository.RoleRepository;
 import com.keystone.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
  
@@ -92,5 +103,63 @@ public class UserService {
         logger.info("User logged in successfully: {}", user.getEmail());
 
         return token;
+    }
+
+    public Page<UserResponse> getAllUsers(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return userRepository.findAll(pageable).map(this::mapToResponse);
+    }
+
+    public List<UserResponse> getUsersByRole(String roleName) {
+        return userRepository.findByRole_Name(roleName.toUpperCase())
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        return mapToResponse(user);
+    }
+
+    public UserResponse updateUser(Long id, UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+
+        if (!user.getEmail().equalsIgnoreCase(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+            throw new BadRequestException("Email already exists");
+        }
+
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setSkills(request.getSkills());
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            user.setStatus(request.getStatus());
+        }
+
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            Role role = roleRepository.findByName(request.getRole().toUpperCase())
+                    .orElseThrow(() -> new BadRequestException("Role not found: " + request.getRole()));
+            user.setRole(role);
+        }
+
+        return mapToResponse(userRepository.save(user));
+    }
+
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        userRepository.delete(user);
+    }
+
+    private UserResponse mapToResponse(User user) {
+        String roleName = user.getRole() != null ? user.getRole().getName() : null;
+        return new UserResponse(user.getId(), user.getFullName(), user.getEmail(), roleName);
     }
 }

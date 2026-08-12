@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -34,7 +36,7 @@ public CorsConfigurationSource corsConfigurationSource() {
 
     CorsConfiguration configuration = new CorsConfiguration();
 
-    configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+    configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:4173"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
@@ -70,6 +72,21 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                             "/v3/api-docs/**",
                             "/swagger-ui.html"
                     ).permitAll()
+
+                    .requestMatchers("/api/users/profile").authenticated()
+
+                    .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "MANAGER")
+
+                    .requestMatchers("/api/roles/**").hasAnyRole("ADMIN", "MANAGER")
+
+                     .requestMatchers("/api/customers/**", "/api/sites/**")
+    .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "CUSTOMER", "TECHNICIAN")
+
+                    .requestMatchers("/api/workorders/**", "/api/technicians/**", "/api/timelogs/**")
+                            .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "TECHNICIAN")
+
+                    .requestMatchers("/api/dashboard/**")
+                            .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "TECHNICIAN")
 
                     .anyRequest().authenticated()
             )

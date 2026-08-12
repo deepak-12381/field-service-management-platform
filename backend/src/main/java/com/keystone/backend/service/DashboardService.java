@@ -36,7 +36,7 @@ public class DashboardService {
         response.setTotalTechnicians(userRepository.countByRole_Name("TECHNICIAN"));
 
         response.setOpenWorkOrders(
-                workOrderRepository.countByStatus("OPEN"));
+                workOrderRepository.countByStatus("NEW"));
 
         response.setInProgressWorkOrders(
                 workOrderRepository.countByStatus("IN_PROGRESS"));
@@ -46,6 +46,15 @@ public class DashboardService {
 
         response.setHighPriorityWorkOrders(
                 workOrderRepository.countByPriority("HIGH"));
+
+        response.setAssignedWorkOrders(
+                workOrderRepository.countByStatus("ASSIGNED"));
+
+        response.setOnHoldWorkOrders(
+                workOrderRepository.countByStatus("ON_HOLD"));
+
+        response.setClosedWorkOrders(
+                workOrderRepository.countByStatus("CLOSED"));
 
         return response;
     }
