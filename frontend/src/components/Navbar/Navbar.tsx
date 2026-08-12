@@ -28,9 +28,10 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+  console.log('D ICON CLICKED');
+  setAnchorEl(event.currentTarget);
+};
 
   const handleClose = () => setAnchorEl(null);
 
@@ -41,7 +42,7 @@ const Navbar: React.FC = () => {
       // ignore
     }
     handleClose();
-    navigate('/login');
+     navigate('/');
   };
 
   return (

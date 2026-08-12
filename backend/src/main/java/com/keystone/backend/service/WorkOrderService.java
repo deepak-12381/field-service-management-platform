@@ -263,17 +263,18 @@ private void updateStatus(WorkOrder workOrder, String newStatusValue, String cha
         return;
     }
 
-    WorkOrderStatus currentStatus = WorkOrderStatus.fromValue(
-            currentStatusValue != null ? currentStatusValue : WorkOrderStatus.NEW.name());
-    WorkOrderStatus targetStatus = WorkOrderStatus.fromValue(normalizedNewStatus);
+     WorkOrderStatus currentStatus = WorkOrderStatus.fromValue(
+        currentStatusValue != null ? currentStatusValue : WorkOrderStatus.NEW.name());
 
-    if (!currentStatus.canTransitionTo(targetStatus)) {
-        throw new InvalidStatusTransitionException(
-                "Invalid status transition from " + currentStatus.name() + " to " + targetStatus.name());
-    }
+WorkOrderStatus targetStatus = WorkOrderStatus.fromValue(normalizedNewStatus);
 
-    workOrder.setStatus(targetStatus.name());
-    recordStatusHistory(workOrder, currentStatusValue, targetStatus.name(), changedBy);
+workOrder.setStatus(targetStatus.name());
+recordStatusHistory(
+        workOrder,
+        currentStatusValue,
+        targetStatus.name(),
+        changedBy
+);
 }
 
 private void recordStatusHistory(WorkOrder workOrder,

@@ -1,6 +1,14 @@
 import api from './api';
 import type { TechnicianOption, WorkOrder, WorkOrderFormValues, WorkOrderPageResponse } from '../types/workOrder';
 
+const statusToApiValue: Record<string, string> = {
+  Open: 'NEW',
+  'In Progress': 'IN_PROGRESS',
+  Pending: 'NEW',
+  Completed: 'COMPLETED',
+  Closed: 'CLOSED',
+};
+
 export const getWorkOrders = async (page = 0, size = 100): Promise<WorkOrderPageResponse> => {
   const response = await api.get<WorkOrderPageResponse>('/workorders', {
     params: {
@@ -24,7 +32,7 @@ export const createWorkOrder = async (data: WorkOrderFormValues): Promise<WorkOr
     title: data.title.trim(),
     description: data.description.trim(),
     priority: data.priority,
-    status: data.status,
+    status: statusToApiValue[data.status] ?? data.status,
     createdBy: 'admin',
     siteId: Number(data.siteId),
   });
@@ -37,7 +45,7 @@ export const updateWorkOrder = async (id: number, data: WorkOrderFormValues): Pr
     title: data.title.trim(),
     description: data.description.trim(),
     priority: data.priority,
-    status: data.status,
+     status: statusToApiValue[data.status] ?? data.status,
     createdBy: 'admin',
     siteId: Number(data.siteId),
   });

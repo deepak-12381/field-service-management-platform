@@ -16,7 +16,8 @@ public enum WorkOrderStatus {
     private static final Set<WorkOrderStatus> IN_PROGRESS_TRANSITIONS = EnumSet.of(ON_HOLD, COMPLETED);
     private static final Set<WorkOrderStatus> ON_HOLD_TRANSITIONS = EnumSet.of(IN_PROGRESS, COMPLETED);
     private static final Set<WorkOrderStatus> COMPLETED_TRANSITIONS = EnumSet.of(CLOSED);
-    private static final Set<WorkOrderStatus> CLOSED_TRANSITIONS = EnumSet.noneOf(WorkOrderStatus.class);
+   private static final Set<WorkOrderStatus> CLOSED_TRANSITIONS =
+        EnumSet.of(NEW, IN_PROGRESS, ON_HOLD, COMPLETED);
 
     public static WorkOrderStatus fromValue(String value) {
         if (value == null || value.isBlank()) {

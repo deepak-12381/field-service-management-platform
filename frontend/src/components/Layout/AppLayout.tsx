@@ -1,6 +1,6 @@
  import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import {
+ import {
   AppBar,
   Avatar,
   Box,
@@ -12,6 +12,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -27,6 +29,8 @@ import BuildIcon from '@mui/icons-material/Build';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const drawerWidth = 240;
 
@@ -48,6 +52,9 @@ const AppLayout: React.FC = () => {
   const navigate = useNavigate();
 
   const [userName, setUserName] = useState('Administrator');
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+
+  
 
 useEffect(() => {
   const loadProfile = () => {
@@ -73,6 +80,23 @@ useEffect(() => {
 }, []);
 
   const handleToggle = () => setOpen((s) => !s);
+
+  const handleUserMenuOpen = (
+  event: React.MouseEvent<HTMLElement>
+) => {
+  setUserMenuAnchor(event.currentTarget);
+};
+
+const handleUserMenuClose = () => {
+  setUserMenuAnchor(null);
+};
+
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userProfile');
+  handleUserMenuClose();
+  navigate('/');
+};
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -101,7 +125,7 @@ useEffect(() => {
           <Box sx={{ flex: 1 }} />
 
            <Box
-  onClick={() => navigate('/profile')}
+    onClick={handleUserMenuOpen}
   sx={{
     display: 'flex',
     alignItems: 'center',
@@ -133,6 +157,39 @@ useEffect(() => {
   {userName ? userName.trim().charAt(0).toUpperCase() : 'A'}
 </Avatar>
 </Box>
+   <Menu
+  anchorEl={userMenuAnchor}
+  open={Boolean(userMenuAnchor)}
+  onClose={handleUserMenuClose}
+  anchorOrigin={{
+    vertical: 'bottom',
+    horizontal: 'right',
+  }}
+  transformOrigin={{
+    vertical: 'top',
+    horizontal: 'right',
+  }}
+>
+  <MenuItem
+    onClick={() => {
+      handleUserMenuClose();
+      navigate('/profile');
+    }}
+  >
+    <ListItemIcon>
+      <AccountCircleIcon fontSize="small" />
+    </ListItemIcon>
+    Profile
+  </MenuItem>
+
+  <MenuItem onClick={handleLogout}>
+    <ListItemIcon>
+      <LogoutIcon fontSize="small" />
+    </ListItemIcon>
+    Logout
+  </MenuItem>
+</Menu>
+   
         </Toolbar>
       </AppBar>
 

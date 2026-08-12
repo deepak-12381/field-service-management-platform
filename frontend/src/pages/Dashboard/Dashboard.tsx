@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getWorkOrders } from "../../services/workOrderService";
 import { getDashboardData, type DashboardData } from "../../services/dashboardService";
 import type { WorkOrder } from "../../types/workOrder";
+import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
   Box,
@@ -65,11 +66,31 @@ const upcomingTasks = [
 ];
 
 const quickActions = [
-  { label: 'Create Customer', icon: <PersonAddIcon sx={{ mr: 1 }} /> },
-  { label: 'Create Site', icon: <PlaceIcon sx={{ mr: 1 }} /> },
-  { label: 'Create Work Order', icon: <WorkIcon sx={{ mr: 1 }} /> },
-  { label: 'Assign Technician', icon: <BuildIcon sx={{ mr: 1 }} /> },
-  { label: 'Generate Report', icon: <ReportIcon sx={{ mr: 1 }} /> },
+  {
+    label: 'Create Customer',
+    icon: <PersonAddIcon sx={{ mr: 1 }} />,
+    path: '/customers',
+  },
+  {
+    label: 'Create Site',
+    icon: <PlaceIcon sx={{ mr: 1 }} />,
+    path: '/sites',
+  },
+  {
+    label: 'Create Work Order',
+    icon: <WorkIcon sx={{ mr: 1 }} />,
+    path: '/work-orders',
+  },
+  {
+    label: 'Assign Technician',
+    icon: <BuildIcon sx={{ mr: 1 }} />,
+    path: '/work-orders',
+  },
+  {
+    label: 'Generate Report',
+    icon: <ReportIcon sx={{ mr: 1 }} />,
+    path: '/reports',
+  },
 ];
 
 const notifications = [
@@ -89,6 +110,7 @@ const notifications = [
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [recentWorkOrders, setRecentWorkOrders] = useState<WorkOrder[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -229,7 +251,15 @@ setRecentWorkOrders(workOrderData.content);
                       Latest work order summary from the field service queue.
                     </Typography>
                   </Box>
-                  <Button variant="contained" color="primary" size="small" startIcon={<CalendarMonthIcon />}>View all</Button>
+                  <Button
+  variant="contained"
+  color="primary"
+  size="small"
+  startIcon={<CalendarMonthIcon />}
+  onClick={() => navigate('/work-orders')}
+>
+  View all
+</Button>
                 </Stack>
                 <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent' }}>
                   <Table sx={{ minWidth: 720 }}>
@@ -335,6 +365,7 @@ setRecentWorkOrders(workOrderData.content);
                         key={action.label}
                         variant="outlined"
                         fullWidth
+                        onClick={() => navigate(action.path)}
                         sx={{ justifyContent: 'flex-start', borderRadius: 2, textTransform: 'none' }}
                       >
                         {action.icon}
