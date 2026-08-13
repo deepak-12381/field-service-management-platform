@@ -12,7 +12,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "keystone_field_service_management_secret_key_2026";
+     private final String SECRET_KEY = System.getenv()
+        .getOrDefault("JWT_SECRET", "keystone_field_service_management_secret_key_2026");
 
     public String generateToken(String email) {
 

@@ -64,7 +64,7 @@ public Page<CustomerResponse> getAllCustomers(
    @GetMapping("/{id}")
 public CustomerResponse getCustomerById(@PathVariable Long id) {
 
-     System.out.println(">>>>>>>> Controller reached with ID = " + id);
+      
 
     return customerService.getCustomerById(id);
 }

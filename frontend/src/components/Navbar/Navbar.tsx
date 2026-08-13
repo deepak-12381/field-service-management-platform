@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
   const open = Boolean(anchorEl);
 
    const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-  console.log('D ICON CLICKED');
+   
   setAnchorEl(event.currentTarget);
 };
 
