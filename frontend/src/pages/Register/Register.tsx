@@ -126,6 +126,26 @@ const Register: React.FC = () => {
                 </Button>
               </Stack>
             </Box>
+            
+             <Box sx={{ textAlign: "center", mt: 3 }}>
+  <Typography color="text.secondary" sx={{ fontSize: 14 }}>
+    Already have an account?{" "}
+    <Button
+      type="button"
+      variant="text"
+      onClick={() => navigate("/login")}
+      sx={{
+        fontWeight: 600,
+        textTransform: "none",
+        minWidth: "auto",
+        p: 0,
+      }}
+    >
+      Sign In
+    </Button>
+  </Typography>
+</Box>
+
           </CardContent>
         </Card>
       </Container>

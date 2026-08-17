@@ -22,4 +22,12 @@ public class AuthController {
     public String loginUser(@RequestBody LoginRequest request) {
         return userService.loginUser(request);
     }
+
+    @PostMapping("/reset-password")
+public String resetPassword(
+        @RequestParam String email,
+        @RequestParam String newPassword) {
+
+    return userService.resetPassword(email, newPassword);
+}
 }

@@ -162,4 +162,25 @@ public class UserService {
         String roleName = user.getRole() != null ? user.getRole().getName() : null;
         return new UserResponse(user.getId(), user.getFullName(), user.getEmail(), roleName);
     }
+
+    public String resetPassword(String email, String newPassword) {
+
+    logger.info("Password reset request received for email: {}", email);
+
+    Optional<User> userOptional = userRepository.findByEmail(email);
+
+    if (userOptional.isEmpty()) {
+        logger.warn("Password reset failed. Email not found: {}", email);
+        return "Email not found!";
+    }
+
+    User user = userOptional.get();
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+    userRepository.save(user);
+
+    logger.info("Password reset successfully for email: {}", email);
+
+    return "Password reset successfully!";
+}
 }

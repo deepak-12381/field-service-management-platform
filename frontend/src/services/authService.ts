@@ -22,7 +22,22 @@ export const register = async (data: RegisterRequest) => {
   return response.data;
 };
 
-export default {
+export const resetPassword = async (
+  email: string,
+  newPassword: string
+) => {
+  const response = await api.post("/auth/reset-password", null, {
+    params: {
+      email,
+      newPassword,
+    },
+  });
+
+  return response.data;
+};
+
+ export default {
   login,
   register,
+  resetPassword,
 };

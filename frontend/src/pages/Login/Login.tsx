@@ -131,9 +131,22 @@ const handleLogin = async () => {
                   }
                   label="Remember Me"
                 />
-                <Link href="#" underline="none" sx={{ color: "primary.main", fontWeight: 600 }}>
-                  Forgot Password?
-                </Link>
+                 <Link
+  component="button"
+  type="button"
+  underline="none"
+  onClick={() => navigate("/forgot-password")}
+  sx={{
+    color: "primary.main",
+    fontWeight: 600,
+    border: 0,
+    background: "none",
+    cursor: "pointer",
+    padding: 0,
+  }}
+>
+  Forgot Password?
+</Link>
               </Box>
 
               <Button
@@ -149,11 +162,28 @@ const handleLogin = async () => {
 </Button>
             </Box>
 
-            <Box sx={{ textAlign: "center", mt: 4 }}>
-              <Typography color="text.secondary" sx={{ fontSize: 14 }}>
-                Authorized Users Only. Contact your System Administrator for account access.
-              </Typography>
-            </Box>
+             <Box sx={{ textAlign: "center", mt: 4 }}>
+  <Typography color="text.secondary" sx={{ fontSize: 14 }}>
+    New user?{" "}
+    <Link
+      component="button"
+      type="button"
+      underline="none"
+      onClick={() => navigate("/register")}
+      sx={{
+        color: "primary.main",
+        fontWeight: 600,
+        cursor: "pointer",
+      }}
+    >
+      Create Account
+    </Link>
+  </Typography>
+
+  <Typography color="text.secondary" sx={{ fontSize: 14, mt: 2 }}>
+    Authorized Users Only. Contact your System Administrator for account access.
+  </Typography>
+</Box>
           </CardContent>
         </Card>
       </Container>
