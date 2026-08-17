@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: field-service-backend
+    env: docker
+    dockerfilePath: Dockerfile
+    dockerContext: backend
+    rootDir: backend
+    plan: free
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false

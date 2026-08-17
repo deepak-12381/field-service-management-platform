@@ -1,25 +1,8 @@
- {
-  "services": {
-    "frontend": {
-      "root": "frontend/"
-    },
-    "backend": {
-      "root": "backend/",
-      "runtime": "container"
-    }
-  },
+{
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": {
-        "service": "backend"
-      }
-    },
-    {
       "source": "/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
+      "destination": "/index.html"
     }
   ]
 }
