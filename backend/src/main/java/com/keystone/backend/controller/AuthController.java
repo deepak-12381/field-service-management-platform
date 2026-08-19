@@ -4,6 +4,7 @@ import com.keystone.backend.dto.RegisterRequest;
 import com.keystone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.keystone.backend.dto.AuthResponse;
 import com.keystone.backend.dto.LoginRequest;
 
  @RestController
@@ -19,8 +20,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestBody LoginRequest request) {
-        return userService.loginUser(request);
+    public AuthResponse loginUser(@RequestBody LoginRequest request) {
+        return userService.authenticateUser(request);
     }
 
     @PostMapping("/reset-password")

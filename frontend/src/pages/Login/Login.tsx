@@ -24,27 +24,43 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-const handleLogin = async () => {
-  try {
-    setLoading(true);
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
 
-    const token = await login({
-      email,
-      password,
-    });
+      const res = await login({
+        email,
+        password,
+      });
 
-    localStorage.setItem("token", token);
+      const token = typeof res === "string" ? res : res?.token;
+      if (!token || token.startsWith("Email not found") || token.startsWith("Invalid password")) {
+        alert(typeof res === "string" ? res : "Invalid email or password");
+        return;
+      }
 
-    navigate("/dashboard");
-  } catch (error) {
-    alert("Invalid email or password");
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
+      localStorage.setItem("token", token);
+
+      if (typeof res === "object" && res !== null) {
+        localStorage.setItem("userProfile", JSON.stringify({
+          name: res.fullName || email.split("@")[0],
+          email: res.email || email,
+          role: res.role || "User",
+        }));
+        window.dispatchEvent(new Event("storage"));
+      }
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || "Invalid email or password";
+      alert(msg);
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box

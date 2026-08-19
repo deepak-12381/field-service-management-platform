@@ -449,7 +449,7 @@ function WorkOrderPage() {
             </TableContainer>
 
             <Stack direction="row" justifyContent="end" sx={{ mt: 3 }}>
-              <Pagination count={pageCount} page={page - 1} onChange={(_, value) => setPage(value)} color="primary" shape="rounded" />
+              <Pagination count={pageCount} page={page} onChange={(_, value) => setPage(value)} color="primary" shape="rounded" />
             </Stack>
           </CardContent>
         </Card>

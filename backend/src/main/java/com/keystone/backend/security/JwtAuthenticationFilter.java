@@ -50,25 +50,31 @@ protected boolean shouldNotFilter(jakarta.servlet.http.HttpServletRequest reques
 }
 
         String jwt = authHeader.substring(7).trim();
-         String email = jwtUtil.extractEmail(jwt);
-         User user = userRepository.findByEmail(email).orElse(null);
+        try {
+            String email = jwtUtil.extractEmail(jwt);
+            if (email != null && !email.isBlank()) {
+                User user = userRepository.findByEmail(email).orElse(null);
 
-          if (user != null) {
-    List<SimpleGrantedAuthority> authorities = List.of();
-    if (user.getRole() != null) {
-        authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
-    }
+                if (user != null) {
+                    List<SimpleGrantedAuthority> authorities = List.of();
+                    if (user.getRole() != null) {
+                        authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+                    }
 
-    UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(
-                    user,
-                    null,
-                    authorities);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    user,
+                                    null,
+                                    authorities);
 
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-}
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("JWT validation failed: " + e.getMessage());
+        }
 
-         filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response);
 
     }
 

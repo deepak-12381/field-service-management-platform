@@ -18,4 +18,14 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            console.warn(`API error (${error.response.status}):`, error.response.data || error.message);
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default api;

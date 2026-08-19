@@ -5,7 +5,15 @@ export interface LoginRequest {
   password: string;
 }
 
-export const login = async (data: LoginRequest) => {
+export interface AuthResponse {
+  message?: string;
+  token?: string;
+  email?: string;
+  fullName?: string;
+  role?: string;
+}
+
+export const login = async (data: LoginRequest): Promise<AuthResponse | string> => {
   const response = await api.post("/auth/login", data);
   return response.data;
 };

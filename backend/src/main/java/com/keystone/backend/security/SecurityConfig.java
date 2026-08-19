@@ -94,10 +94,10 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "CUSTOMER", "TECHNICIAN")
 
                     .requestMatchers("/api/workorders/**", "/api/technicians/**", "/api/timelogs/**")
-                            .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "TECHNICIAN")
+                            .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "CUSTOMER", "TECHNICIAN")
 
                     .requestMatchers("/api/dashboard/**")
-                            .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "TECHNICIAN")
+                            .hasAnyRole("ADMIN", "MANAGER", "DISPATCHER", "CUSTOMER", "TECHNICIAN")
 
                     .anyRequest().authenticated()
             )
