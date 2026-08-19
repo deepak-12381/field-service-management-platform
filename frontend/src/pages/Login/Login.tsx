@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/authService";
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -22,22 +23,34 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    setErrorMsg("");
+
+    if (!email.trim() || !password) {
+      setErrorMsg("Please enter both email address and password.");
+      return;
+    }
+
     try {
       setLoading(true);
 
       const res = await login({
-        email,
+        email: email.trim(),
         password,
       });
 
       const token = typeof res === "string" ? res : res?.token;
       if (!token || token.startsWith("Email not found") || token.startsWith("Invalid password")) {
-        alert(typeof res === "string" ? res : "Invalid email or password");
+        const msg = typeof res === "string" ? res : "Invalid email or password";
+        setErrorMsg(msg);
         return;
       }
 
@@ -54,9 +67,16 @@ function Login() {
 
       navigate("/dashboard");
     } catch (error: any) {
-      const msg = error?.response?.data?.message || "Invalid email or password";
-      alert(msg);
-      console.error(error);
+      let msg = "Invalid email or password";
+      if (error?.code === "ECONNABORTED") {
+        msg = "Request timed out. The backend server on Render may be waking up. Please try again in a few seconds.";
+      } else if (typeof error?.response?.data?.message === "string") {
+        msg = error.response.data.message;
+      } else if (error?.message === "Network Error") {
+        msg = "Unable to connect to backend server. Please check your network connection.";
+      }
+      setErrorMsg(msg);
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
@@ -92,7 +112,13 @@ function Login() {
               </Typography>
             </Box>
 
-            <Box component="form" noValidate>
+            <Box component="form" onSubmit={handleLogin} noValidate>
+              {errorMsg && (
+                <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+                  {errorMsg}
+                </Alert>
+              )}
+
               <TextField
                 fullWidth
                 label="Email Address"
@@ -167,10 +193,10 @@ function Login() {
 
               <Button
   fullWidth
+  type="submit"
   variant="contained"
   color="primary"
   size="large"
-  onClick={handleLogin}
   disabled={loading}
   sx={{ mt: 3, py: 1.6, borderRadius: 2, fontWeight: 700 }}
 >
